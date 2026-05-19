@@ -1,0 +1,15 @@
+# Credentials and keys
+*.csv
+.aws/
+.env
+
+# Python environment
+env/
+__pycache__/
+*.pyc
+
+# Data and models
+data/raw/*
+!data/raw/.gitkeep
+*.joblib
+*.pkl
