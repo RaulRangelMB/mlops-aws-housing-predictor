@@ -1,0 +1,47 @@
+name: Deploy MLOps Predictor to AWS Lambda
+
+on:
+  push:
+    branches:
+      - main  # Runs the pipeline automatically every time you push code to main
+
+jobs:
+  deploy:
+    name: Build, Push, and Deploy Container
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Pull down the fresh code changes into the GitHub runner namespace
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # 2. Authenticate the runner using the secure repository secrets
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-north-1
+
+    # 3. Log the runner's local Docker client into your private Amazon ECR registry
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    # 4. Build the container layers on the runner and push the compiled image to Stockholm
+    - name: Build, Tag, and Push Image to ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: housing-predictor
+        IMAGE_TAG: latest
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+    # 5. Issue a command to AWS Lambda to pull down and refresh the active container cluster
+    - name: Update Lambda Function Code
+      run: |
+        aws lambda update-function-code \
+          --function-name predict-housing-price \
+          --image-uri ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-north-1.amazonaws.com/housing-predictor:latest \
+          --region eu-north-1
