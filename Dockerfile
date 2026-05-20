@@ -1,8 +1,8 @@
 # Use the official AWS Lambda base image for Python 3.12
 FROM public.ecr.aws/lambda/python:3.12
 
-# Copy requirements.txt dependency list into the Lambda environment
-COPY requirements.txt ${LAMBDA_TASK_ROOT}/
+# Copy requirements-backend.txt dependency list into the Lambda environment
+COPY requirements-backend.txt ${LAMBDA_TASK_ROOT}/
 
 # Install Python dependencies directly into the container task root
 RUN pip install --no-cache-dir -r ${LAMBDA_TASK_ROOT}/requirements.txt
