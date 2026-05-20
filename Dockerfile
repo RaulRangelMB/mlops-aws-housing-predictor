@@ -2,7 +2,7 @@
 FROM public.ecr.aws/lambda/python:3.12
 
 # Copy requirements-backend.txt dependency list into the Lambda environment
-COPY requirements-backend.txt ${LAMBDA_TASK_ROOT}/
+COPY requirements-backend.txt ${LAMBDA_TASK_ROOT}/requirements.txt
 
 # Install Python dependencies directly into the container task root
 RUN pip install --no-cache-dir -r ${LAMBDA_TASK_ROOT}/requirements.txt
