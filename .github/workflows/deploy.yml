@@ -42,6 +42,6 @@ jobs:
     - name: Update Lambda Function Code
       run: |
         aws lambda update-function-code \
-          --function-name predict-housing-price \
+          --function-name predict-housing-price-tf \
           --image-uri ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-north-1.amazonaws.com/housing-predictor:latest \
           --region eu-north-1
